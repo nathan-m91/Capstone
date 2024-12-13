@@ -1,12 +1,14 @@
 import pandas as pd
 import sqlite3
+import matplotlib.pyplot as plt
 
 # Load the data
 pokedex_df = pd.read_csv('pokedex.csv')
 valid_moves_df = pd.read_csv('valid_moves.csv')
 all_moves_df = pd.read_csv('all_moves.csv')
 
-# Data cleanup
+# Data cleanup. Dropped unneccessary columns in dfs
+# Also renamed some columns to make it easier to run queries
 all_moves_df = all_moves_df.drop(columns=['IsNonstandard'], axis=1)
 pokedex_df = pokedex_df.drop(columns=['Gendered', 'Total', 'height', 'weight', 'prevo'], axis=1)
 pokedex_df = pokedex_df.rename(columns={'ability_0': 'Ability1', 'ability_1': 'Ability2', 'ability_H': 'HiddenAbility'})
@@ -27,7 +29,13 @@ merged_moves_df = pd.merge(
     right_on="Name",
     how="inner"  
 )
+# I dropped the Name column here as it was giving me trouble dropping beforehand
+# The column was redundant but for some reason necessary for the merge
+# Saved the clean data to csv for easy access if needed later. Commented out the save to csv so it doesn't save each time
 merged_moves_df = merged_moves_df.drop(columns=['Name'], axis=1)
+# merged_moves_df.to_csv("Cleaned_Move_Data.csv", index=False)
+# pokedex_df.to_csv("Cleaned_Pokedex.csv", index=False)
+
 
 # Create SQL and move dfs to the db
 con = sqlite3.connect("poke_dojo.db")
@@ -102,7 +110,7 @@ while True:
             results_df = pd.DataFrame(final_output)
             results.append(results_df)
 
-            # Print result
+            # Print results of the query
             print(f"Details for Pokémon '{name}':")
             print(results_df)
 
@@ -113,13 +121,32 @@ while True:
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        continue  # Continue asking for the next Pokémon name if there's an error
+        continue  # Continues asking for the next Pokémon name if there's an error
 
 #Combining all results into a single CSV so you can see all data in Excel rather than through vscode
+#This will save the csv directly to the Capstone folder. I moved the sample I created to the Saved Data folder
 if results:
     final_df = pd.concat(results, ignore_index=True)
-    final_df.to_csv("all_pokemon_details.csv", index=False)
-    print(f"All results saved to 'all_pokemon_details.csv'.")
+    final_df.to_csv("Pokemon_Results.csv", index=False)
+    print(f"All results saved to 'Pokemon_Results.csv'.")
 else:
     print("No results to save.")
+
+
+#This is used to visualize the data through matplot.
+#It gives the top 5 Pokemon for each stat
+top_stats = input("Check the top Pokemon for each stat? (yes/no): ").strip().lower()
+if top_stats == 'yes':
+    for stat in ['HP', 'ATK', 'DEF', 'SPA', 'SPD', 'SPE']:
+        top_5 = pokedex_df.nlargest(5, stat)
+
+# Graph settings
+        plt.figure(figsize=(8, 5))
+        plt.bar(top_5['Name'], top_5[stat], color='green', edgecolor='black')
+        plt.title(f"Top 5 Pokémon by {stat}", fontsize=16)
+        plt.xlabel("Pokémon", fontsize=12)
+        plt.ylabel(stat, fontsize=12)
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.show()
 
