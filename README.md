@@ -11,6 +11,11 @@ Once you run the code, it will ask you for some input (pokemon name, etc.) Once 
 
 To run this project, you can open the Pokémon.py file. I've notated each section of the code thoroughly to make sure its easily understandable. In lines 36 and 37 I've commented it out so it doesn't spam you with cleaned data thats already in the project under the Cleaned Data folder. If you'd like to test that part out too, just uncomment it and it should work! I've added sample data of what the finished csv looks like when its created. Yours may differ depending on what Pokémon you enter into the query :)
 
+If you're here for the quick rundown of the top Pokemon for each stat, you can head over to the Plots for Stats folder as it graphs out the top 5 Pokemon for each stat (HP, ATK, etc.) Surprisingly the top 5 for each stat aren't all legendary Pokemon!
+
+https://github.com/nathan-m91/Capstone/tree/main/Plots%20for%20Stats
+
+
 
 
 
